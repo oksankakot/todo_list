@@ -32,6 +32,17 @@ class TaskUpdateView(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def patch(self, request, pk, format=None):
+        try:
+            task = Task.objects.get(pk=pk, user=request.user)
+        except Task.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        task.status = "completed"
+        task.save()
+        return Response(
+            {"status": "Task marked as completed"}, status=status.HTTP_200_OK
+        )
+
 
 class TaskDeleteView(APIView):
     permission_classes = [IsAuthenticated]
@@ -69,5 +80,12 @@ class UserTaskListView(APIView):
 
     def get(self, request, format=None):
         tasks = Task.objects.filter(user=request.user)
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TaskListByStatusView(APIView):
+    def get(self, request, status, format=None):
+        tasks = Task.objects.filter(status=status)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
