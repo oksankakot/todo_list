@@ -85,7 +85,7 @@ class UserTaskListView(APIView):
 
 
 class TaskListByStatusView(APIView):
-    def get(self, request, status, format=None):
-        tasks = Task.objects.filter(status=status)
+    def get(self, request, task_status, format=None):
+        tasks = Task.objects.filter(status=task_status)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
