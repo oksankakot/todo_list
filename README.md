@@ -175,6 +175,8 @@ GET /api/tasks/tasks-by-status/<str:task_status>/
   "status": "new"
 }
 ```
+**Example**
+![img.png](img.png)
 
 ## Testing
 
