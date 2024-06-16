@@ -23,7 +23,10 @@ class TaskUpdateView(APIView):
 
     def put(self, request, pk, format=None):
         try:
-            task = Task.objects.get(pk=pk, user=request.user)
+            if request.user.is_superuser:
+                task = Task.objects.get(pk=pk)
+            else:
+                task = Task.objects.get(pk=pk, user=request.user)
         except Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         serializer = TaskSerializer(task, data=request.data)
@@ -34,14 +37,17 @@ class TaskUpdateView(APIView):
 
     def patch(self, request, pk, format=None):
         try:
-            task = Task.objects.get(pk=pk, user=request.user)
+            if request.user.is_superuser:
+                task = Task.objects.get(pk=pk)
+            else:
+                task = Task.objects.get(pk=pk, user=request.user)
         except Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        task.status = "completed"
-        task.save()
-        return Response(
-            {"status": "Task marked as completed"}, status=status.HTTP_200_OK
-        )
+        serializer = TaskSerializer(task, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TaskDeleteView(APIView):
@@ -49,7 +55,10 @@ class TaskDeleteView(APIView):
 
     def delete(self, request, pk, format=None):
         try:
-            task = Task.objects.get(pk=pk, user=request.user)
+            if request.user.is_superuser:
+                task = Task.objects.get(pk=pk)
+            else:
+                task = Task.objects.get(pk=pk, user=request.user)
         except Task.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
         task.delete()
@@ -61,16 +70,25 @@ class TaskDetailView(APIView):
 
     def get(self, request, pk, format=None):
         try:
-            task = Task.objects.get(pk=pk, user=request.user)
+            if request.user.is_superuser:
+                task = Task.objects.get(pk=pk)
+            else:
+                task = Task.objects.get(pk=pk, user=request.user)
         except Task.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "Task not found or you do not have permission to access it"},
+                            status=status.HTTP_404_NOT_FOUND)
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TaskListView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, format=None):
-        tasks = Task.objects.all()
+        if request.user.is_superuser:
+            tasks = Task.objects.all()
+        else:
+            tasks = Task.objects.filter(user=request.user)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -79,13 +97,21 @@ class UserTaskListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        tasks = Task.objects.filter(user=request.user)
+        if request.user.is_superuser:
+            tasks = Task.objects.all()
+        else:
+            tasks = Task.objects.filter(user=request.user)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TaskListByStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, task_status, format=None):
-        tasks = Task.objects.filter(status=task_status)
+        if request.user.is_superuser:
+            tasks = Task.objects.filter(status=task_status)
+        else:
+            tasks = Task.objects.filter(status=task_status, user=request.user)
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
