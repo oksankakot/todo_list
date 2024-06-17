@@ -42,7 +42,7 @@ class TaskListByStatusView(generics.ListAPIView):
     pagination_class = CustomPagination
 
     def get_queryset(self):
-        task_status = self.kwargs['task_status']
+        task_status = self.kwargs["task_status"]
         if self.request.user.is_superuser:
             return Task.objects.filter(status=task_status)
         return Task.objects.filter(status=task_status, user=self.request.user)
