@@ -36,65 +36,74 @@ This project is a ToDo List API built with Django and Django REST Framework, usi
 
 ## Database Setup
 
-1. **Start the PostgresSQL container:**
-    ```bash
-    docker-compose up -d
-    ```
-   
-2. **Configure Django to use PostgresSQL:**  
+1. Create a .env file in the root directory of the project with the following content:
+```bash
+DB_NAME=todolist
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
+```
 
-    In your settings.py file, update the DATABASES configuration:
+2. **Start the PostgresSQL container:**
+```bash
+docker-compose up -d
+```
+   
+3. **Configure Django to use PostgresSQL:**  
+
+In your settings.py file, update the DATABASES configuration:
 
 ```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'todolist',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 ```
 
-3. **Apply migrations:**
-    ```bash
-   python manage.py migrate
-    ```
+4. **Apply migrations:**
+```bash
+python manage.py migrate
+```
 
-4. **Create a superuser:**
-    ```bash
-    python manage.py createsuperuser
-    ```
+5. **Create a superuser:**
+```bash
+python manage.py createsuperuser
+```
 
 ## Running the Application
 
 1. **Start the Django development server:**
-    ```bash
-    python manage.py runserver
-   ```
+```bash
+python manage.py runserver
+```
 
 2. **Access the application:**
-    Open your browser and navigate to http://127.0.0.1:8000.
+Open your browser and navigate to http://127.0.0.1:8000.
 
 
 ## API Documentation
 
 **Authentication**
-    Obtain token:
-    ```bash
-    POST /api/token/
-   ```
+Obtain token:
+```bash
+POST /api/token/
+```
 
 **Request Body:**
-
 ```json
-{
-    "username": "your_username",
-    "password": "your_password"
-}
+    {
+      "username": "your_username",
+      "password": "your_password"
+    }
 ```
+
 
 **Refresh Token:**
 ```bash
@@ -114,14 +123,15 @@ POST /api/token/refresh/
 ```bash
 POST /api/tasks/create-task/
 ```
-Request Body:
-````json
+
+**Request Body:**
+```json
 {
   "title": "New Task",
   "description": "Task description",
   "status": "new"
 }
-````
+```
 
 **Get All Tasks:**
 ```bash
@@ -143,6 +153,7 @@ GET /api/tasks/<int:pk>/
 PUT /api/tasks/<int:pk>/update/
 ```
 Request Body:
+
 ```json
 {
   "title": "Updated Task",
@@ -175,7 +186,7 @@ GET /api/tasks/tasks-by-status/<str:task_status>/
   "status": "new"
 }
 ```
-**Example**
+**Database example**
 ![img.png](img.png)
 
 ## Testing
