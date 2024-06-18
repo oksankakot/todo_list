@@ -16,5 +16,9 @@ urlpatterns = [
         TaskListByStatusView.as_view(),
         name="task-list-by-status",
     ),
-    path("<int:pk>/complete/", MarkTaskAsCompletedView.as_view(), name="mark-task-as-completed"),
+    path(
+        "<int:pk>/complete/",
+        MarkTaskAsCompletedView.as_view(),
+        name="mark-task-as-completed",
+    ),
 ]

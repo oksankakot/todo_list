@@ -76,7 +76,7 @@ class MarkTaskAsCompletedView(generics.UpdateAPIView):
 
     def update(self, request, *args, **kwargs):
         task = self.get_object()
-        task.status = 'completed'
+        task.status = "completed"
         task.save()
         serializer = self.get_serializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
