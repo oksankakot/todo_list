@@ -34,6 +34,16 @@ class UserAPITestCase(APITestCase):
         self.assertEqual(User.objects.count(), 3)
         self.assertTrue(User.objects.filter(username="newuser").exists())
 
+    def test_create_user_missing_fields(self):
+        url = reverse("user-list-create")
+        data = {
+            "username": "newuser",
+            "password": "newpassword",
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("first_name", response.data)
+
     def test_get_user(self):
         token = self.obtain_token("testuser", "password")
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + token)

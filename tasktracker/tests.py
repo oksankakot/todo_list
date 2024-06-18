@@ -39,6 +39,15 @@ class TaskAPITestCase(APITestCase):
         self.assertEqual(Task.objects.count(), 2)
         self.assertEqual(Task.objects.get(id=2).title, "New Task")
 
+    def test_create_task_missing_fields(self):
+        token = self.obtain_token("testuser", "password")
+        self.client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
+        url = reverse("task-list-create")
+        data = {"description": "Task description", "status": "new"}
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("title", response.data)
+
     def test_get_all_tasks(self):
         token = self.obtain_token("testuser", "password")
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
