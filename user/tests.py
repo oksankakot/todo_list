@@ -13,7 +13,6 @@ class UserAPITestCase(APITestCase):
             username="admin", password="password", first_name="Admin"
         )
         self.client = APIClient()
-        self.client.login(username="testuser", password="password")
 
     def obtain_token(self, username, password):
         url = reverse("token_obtain_pair")
@@ -33,7 +32,17 @@ class UserAPITestCase(APITestCase):
         response = self.client.post(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(User.objects.count(), 3)
-        self.assertEqual(User.objects.get(id=3).username, "newuser")
+        self.assertTrue(User.objects.filter(username="newuser").exists())
+
+    def test_create_user_missing_fields(self):
+        url = reverse("user-list-create")
+        data = {
+            "username": "newuser",
+            "password": "newpassword",
+        }
+        response = self.client.post(url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("first_name", response.data)
 
     def test_get_user(self):
         token = self.obtain_token("testuser", "password")

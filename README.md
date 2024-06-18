@@ -56,13 +56,13 @@ In your settings.py file, update the DATABASES configuration:
 
 ```python
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('DB_NAME'),
-        'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': os.getenv('DB_HOST'),
-        'PORT': os.getenv('DB_PORT'),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT"),
     }
 }
 ```
@@ -121,7 +121,7 @@ POST /api/token/refresh/
 
 **Create a Task:**
 ```bash
-POST /api/tasks/create-task/
+POST /api/tasks/
 ```
 
 **Request Body:**
@@ -135,13 +135,9 @@ POST /api/tasks/create-task/
 
 **Get All Tasks:**
 ```bash
-GET /api/tasks/all-tasks/
+GET /api/tasks/
 ```
 
-**Get User Tasks:**
-```bash
-GET /api/tasks/user-tasks/
-```
 
 **Get Task Detail:**
 ```bash
@@ -150,7 +146,7 @@ GET /api/tasks/<int:pk>/
 
 **Update Task:**
 ```bash
-PUT /api/tasks/<int:pk>/update/
+PUT /api/tasks/<int:pk>/
 ```
 Request Body:
 
@@ -164,12 +160,17 @@ Request Body:
 
 **Delete Task:**
 ```sql
-DELETE /api/tasks/<int:pk>/delete/
+DELETE /api/tasks/<int:pk>/
 ```
 
 **Filter Tasks by Status:**
 ```bash
-GET /api/tasks/tasks-by-status/<str:task_status>/
+GET /api/tasks/status/<str:task_status>/
+```
+
+**Mark task as Completed:**
+```bash
+PATCH /api/tasks/<int:pk>/complete/
 ```
 
 ## Usage
@@ -178,14 +179,10 @@ GET /api/tasks/tasks-by-status/<str:task_status>/
     - Obtain your access token by making a POST request to /api/token/ with your username and password.
     - Use the obtained access token to authenticate subsequent requests by adding it to the Authorization header as Bearer <your_access_token>.
 
-2. **Example: Create a Task**
-```json
-{
-  "title": "Example Task",
-  "description": "This is an example task",
-  "status": "new"
-}
-```
+Example:
+![img_1.png](img_1.png)
+![img_2.png](img_2.png)
+
 **Database example**
 ![img.png](img.png)
 

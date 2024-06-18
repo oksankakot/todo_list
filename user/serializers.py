@@ -9,11 +9,17 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        user = User(
-            username=validated_data["username"],
-            first_name=validated_data["first_name"],
-            last_name=validated_data.get("last_name", ""),
-        )
-        user.set_password(validated_data["password"])
+        password = validated_data.pop("password")
+        user = User(**validated_data)
+        user.set_password(password)
         user.save()
         return user
+
+    def validate(self, data):
+        if not data.get("first_name"):
+            raise serializers.ValidationError({"first_name": "This field is required."})
+        if not data.get("username"):
+            raise serializers.ValidationError({"username": "This field is required."})
+        if not data.get("password"):
+            raise serializers.ValidationError({"password": "This field is required."})
+        return data
