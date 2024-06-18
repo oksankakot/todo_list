@@ -85,6 +85,8 @@ class MarkTaskAsCompletedView(generics.UpdateAPIView):
             serializer = self.get_serializer(task)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Task.DoesNotExist:
-            return Response({"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Task not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         except serializers.ValidationError as e:
             return Response(e.detail, status=status.HTTP_400_BAD_REQUEST)

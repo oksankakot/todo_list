@@ -45,9 +45,7 @@ class TaskAPITestCase(APITestCase):
         url = reverse("all-tasks-list")
         response = self.client.get(url, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(
-            len(response.data["results"]), 1
-        )
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_get_task_detail(self):
         token = self.obtain_token("testuser", "password")
@@ -61,7 +59,11 @@ class TaskAPITestCase(APITestCase):
         token = self.obtain_token("testuser", "password")
         self.client.credentials(HTTP_AUTHORIZATION="Bearer " + token)
         url = reverse("task-detail", kwargs={"pk": self.task.id})
-        data = {"title": "Updated Task", "description": self.task.description, "status": self.task.status}
+        data = {
+            "title": "Updated Task",
+            "description": self.task.description,
+            "status": self.task.status,
+        }
         response = self.client.put(url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.task.refresh_from_db()
