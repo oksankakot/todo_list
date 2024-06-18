@@ -64,15 +64,19 @@ class AllTasksListView(generics.ListAPIView):
     pagination_class = CustomPagination
 
 
-class MarkTaskAsCompletedView(APIView):
+class MarkTaskAsCompletedView(generics.UpdateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def patch(self, request, pk, format=None):
-        try:
-            task = Task.objects.get(pk=pk, user=request.user)
-        except Task.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            return Task.objects.all()
+        return Task.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        task = self.get_object()
         task.status = 'completed'
         task.save()
-        serializer = TaskSerializer(task)
+        serializer = self.get_serializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
